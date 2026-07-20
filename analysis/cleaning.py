@@ -7,10 +7,10 @@ OUTPUT = "data/cleaned"
 os.makedirs(OUTPUT, exist_ok=True)
 
 files = [
-    "standard_stats.csv",
-    "goalkeepers.csv",
+    "standard.csv",
     "shooting.csv",
-    "playing_time.csv",
+    "time.csv",
+    "goalkeeping.csv",
     "miscellaneous.csv"
 ]
 

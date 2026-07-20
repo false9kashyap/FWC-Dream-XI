@@ -37,10 +37,12 @@ df.loc[fw,"Score"] = (
 # Midfielder
 mf = df["Pos"].str.contains("MF", na=False)
 
-df.loc[mf,"Score"] = (
-    0.45*df.loc[mf,"Performance_Ast"] +
-    0.25*df.loc[mf,"Performance_Gls"] +
-    0.30*df.loc[mf,"Playing Time_Min"]
+df.loc[mf, "Score"] = (
+    0.30 * df.loc[mf, "Performance_Ast"] +
+    0.30 * df.loc[mf, "Performance_Gls"] +
+    0.20 * df.loc[mf, "Performance_TklW"] +
+    0.10 * df.loc[mf, "Performance_Int"] +
+    0.10 * df.loc[mf, "Playing Time_Min"]
 )
 
 # Defender
