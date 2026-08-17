@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FIFA World Cup 2026 Dream XI Dashboard — Interactive analytics featuring top player scores, formation view, and comprehensive statistics.">
+  <title>FWC 2026 Dream XI — Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a2035;
+      --bg-card-hover: #1f2847;
+      --bg-surface: #0f1629;
+      --bg-tooltip: #1e293b;
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-accent: #e2e8f0;
+
+      --accent-gold: #f59e0b;
+      --accent-gold-dim: rgba(245, 158, 11, 0.15);
+      --accent-blue: #3b82f6;
+      --accent-blue-dim: rgba(59, 130, 246, 0.12);
+      --accent-green: #10b981;
+      --accent-green-dim: rgba(16, 185, 129, 0.12);
+      --accent-red: #ef4444;
+      --accent-red-dim: rgba(239, 68, 68, 0.12);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-dim: rgba(6, 182, 212, 0.12);
+
+      --border-subtle: rgba(148, 163, 184, 0.08);
+      --border-hover: rgba(148, 163, 184, 0.15);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+      --shadow-elevated: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-tooltip: 0 12px 40px rgba(0,0,0,0.5);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       SCROLLBAR
+       ============================================ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.35); }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .dashboard-header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-gold), #d97706);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #0a0e1a;
+      letter-spacing: -1px;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-stat {
+      text-align: right;
+    }
+
+    .header-stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .header-stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* ============================================
+       MAIN LAYOUT
+       ============================================ */
+    .dashboard-body {
+      padding: 1.25rem 1.5rem 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       SECTION TITLES
+       ============================================ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       DREAM XI PLAYER CARDS - TOP ROW
+       ============================================ */
+    .dream-xi-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .player-card {
+      flex: 0 0 auto;
+      width: 130px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 10px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      opacity: 0;
+      transition: opacity var(--transition-normal);
+    }
+
+    .player-card.pos-fw::before { background: var(--accent-red); }
+    .player-card.pos-mf::before { background: var(--accent-blue); }
+    .player-card.pos-df::before { background: var(--accent-green); }
+    .player-card.pos-gk::before { background: var(--accent-gold); }
+
+    .player-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .player-card:hover::before {
+      opacity: 1;
+    }
+
+    .player-card-rank {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .player-card-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .pos-fw .player-card-avatar { background: var(--accent-red-dim); color: var(--accent-red); }
+    .pos-mf .player-card-avatar { background: var(--accent-blue-dim); color: var(--accent-blue); }
+    .pos-df .player-card-avatar { background: var(--accent-green-dim); color: var(--accent-green); }
+    .pos-gk .player-card-avatar { background: var(--accent-gold-dim); color: var(--accent-gold); }
+
+    .player-card-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .player-card-team {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+    }
+
+    .player-card-pos {
+      display: inline-block;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .pos-fw .player-card-pos { background: var(--accent-red-dim); color: var(--accent-red); }
+    .pos-mf .player-card-pos { background: var(--accent-blue-dim); color: var(--accent-blue); }
+    .pos-df .player-card-pos { background: var(--accent-green-dim); color: var(--accent-green); }
+    .pos-gk .player-card-pos { background: var(--accent-gold-dim); color: var(--accent-gold); }
+
+    .player-card-score {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 6px;
+    }
+
+    /* ============================================
+       HOVER TOOLTIP
+       ============================================ */
+    .player-tooltip {
+      position: fixed;
+      z-index: 1000;
+      background: var(--bg-tooltip);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      min-width: 300px;
+      max-width: 360px;
+      box-shadow: var(--shadow-tooltip);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      backdrop-filter: blur(16px);
+    }
+
+    .player-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tooltip-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tooltip-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .tooltip-player-name {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .tooltip-player-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .tooltip-score-badge {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+
+    .tooltip-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .tooltip-stat {
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .tooltip-stat-value {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .tooltip-stat-label {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* ============================================
+       MAIN GRID
+       ============================================ */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.25rem;
+    }
+
+    /* ============================================
+       PANEL CARD
+       ============================================ */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: border-color var(--transition-normal);
+    }
+
+    .panel:hover {
+      border-color: var(--border-hover);
+    }
+
+    .panel-header {
+      padding: 14px 18px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+
+    .panel-badge {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--accent-blue-dim);
+      color: var(--accent-blue);
+    }
+
+    .panel-body {
+      padding: 14px 18px 18px;
+    }
+
+    /* ============================================
+       FORMATION VIEW (Panel 1)
+       ============================================ */
+    .formation-panel {
+      grid-column: 1 / 2;
+      grid-row: 1 / 3;
+    }
+
+    .pitch {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #0d4f2b;
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
+    }
+
+    .pitch::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 9.09%,
+          rgba(255,255,255,0.04) 9.09%,
+          rgba(255,255,255,0.04) 9.15%
+        );
+    }
+
+    /* Pitch markings */
+    .pitch-center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .pitch-center-line {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      right: 5%;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .pitch-box-top {
+      position: absolute;
+      top: 2%;
+      left: 20%;
+      right: 20%;
+      height: 14%;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+    }
+
+    .pitch-box-bottom {
+      position: absolute;
+      bottom: 2%;
+      left: 20%;
+      right: 20%;
+      height: 14%;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .pitch-player {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+      z-index: 2;
+    }
+
+    .pitch-player:hover {
+      transform: translate(-50%, -50%) scale(1.12);
+      z-index: 3;
+    }
+
+    .pitch-player-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      margin: 0 auto 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: box-shadow var(--transition-fast);
+    }
+
+    .pitch-player:hover .pitch-player-dot {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    .pitch-player-dot.fw { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    .pitch-player-dot.mf { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .pitch-player-dot.df { background: linear-gradient(135deg, #059669, #10b981); }
+    .pitch-player-dot.gk { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+    .pitch-player-label {
+      font-size: 0.55rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ============================================
+       TOP SCORERS TABLE (Panel 2)
+       ============================================ */
+    .scorers-panel {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .stats-table thead th {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .stats-table thead th:last-child,
+    .stats-table thead th.num {
+      text-align: right;
+    }
+
+    .stats-table tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background var(--transition-fast);
+    }
+
+    .stats-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .stats-table tbody tr:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .stats-table tbody td {
+      padding: 8px 8px;
+      font-size: 0.75rem;
+      color: var(--text-accent);
+      vertical-align: middle;
+    }
+
+    .stats-table tbody td:last-child,
+    .stats-table tbody td.num {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .table-rank {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 24px;
+    }
+
+    .table-player-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .table-pos-badge {
+      font-size: 0.55rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    .table-pos-badge.fw { background: var(--accent-red-dim); color: var(--accent-red); }
+    .table-pos-badge.mf { background: var(--accent-blue-dim); color: var(--accent-blue); }
+    .table-pos-badge.df { background: var(--accent-green-dim); color: var(--accent-green); }
+    .table-pos-badge.gk { background: var(--accent-gold-dim); color: var(--accent-gold); }
+
+    .score-bar-cell {
+      width: 100px;
+    }
+
+    .score-bar-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--accent-gold);
+      transition: width var(--transition-slow);
+    }
+
+    /* ============================================
+       TOP ASSISTS TABLE (Panel 3)
+       ============================================ */
+    .assists-panel {
+      grid-column: 3 / 4;
+      grid-row: 1 / 2;
+    }
+
+    /* ============================================
+       STATS OVERVIEW CARDS (Panel 4)
+       ============================================ */
+    .overview-panel {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .kpi-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      transition: all var(--transition-normal);
+    }
+
+    .kpi-item:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border-hover);
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .kpi-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .kpi-item.gold .kpi-value { color: var(--accent-gold); }
+    .kpi-item.blue .kpi-value { color: var(--accent-blue); }
+    .kpi-item.green .kpi-value { color: var(--accent-green); }
+    .kpi-item.red .kpi-value { color: var(--accent-red); }
+    .kpi-item.cyan .kpi-value { color: var(--accent-cyan); }
+
+    /* ============================================
+       POSITION BREAKDOWN (Panel 5)
+       ============================================ */
+    .breakdown-panel {
+      grid-column: 3 / 4;
+      grid-row: 2 / 3;
+    }
+
+    .position-bar-item {
+      margin-bottom: 14px;
+    }
+
+    .position-bar-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .position-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .position-bar-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .position-bar-count {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .position-bar-track {
+      height: 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .position-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width var(--transition-slow);
+    }
+
+    .position-bar-fill.fw { background: linear-gradient(90deg, var(--accent-red), #f87171); }
+    .position-bar-fill.mf { background: linear-gradient(90deg, var(--accent-blue), #60a5fa); }
+    .position-bar-fill.df { background: linear-gradient(90deg, var(--accent-green), #34d399); }
+    .position-bar-fill.gk { background: linear-gradient(90deg, var(--accent-gold), #fbbf24); }
+
+    /* Player list in breakdown */
+    .position-players {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .position-player-chip {
+      font-size: 0.58rem;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       FULL PLAYER RANKINGS TABLE
+       ============================================ */
+    .rankings-section {
+      margin-top: 1.5rem;
+    }
+
+    .rankings-panel {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .rankings-panel .panel-body {
+      padding: 0;
+    }
+
+    .rankings-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rankings-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg-card);
+    }
+
+    .rankings-table thead th {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: color var(--transition-fast);
+    }
+
+    .rankings-table thead th:hover {
+      color: var(--text-secondary);
+    }
+
+    .rankings-table thead th.num {
+      text-align: right;
+    }
+
+    .rankings-table thead th.sorted-asc::after { content: ' ▲'; font-size: 0.5rem; }
+    .rankings-table thead th.sorted-desc::after { content: ' ▼'; font-size: 0.5rem; }
+
+    .rankings-table tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background var(--transition-fast);
+    }
+
+    .rankings-table tbody tr:hover {
+      background: rgba(255,255,255,0.025);
+    }
+
+    .rankings-table tbody tr.dream-xi-row {
+      background: var(--accent-gold-dim);
+    }
+
+    .rankings-table tbody tr.dream-xi-row:hover {
+      background: rgba(245, 158, 11, 0.2);
+    }
+
+    .rankings-table tbody td {
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      color: var(--text-accent);
+      white-space: nowrap;
+    }
+
+    .rankings-table tbody td.num {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+
+    .dream-xi-star {
+      color: var(--accent-gold);
+      font-size: 0.7rem;
+      margin-left: 4px;
+    }
+
+    /* ============================================
+       SEARCH/FILTER BAR
+       ============================================ */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 320px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 9px 14px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .filter-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 16px;
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.3px;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--accent-blue-dim);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    /* ============================================
+       LOADING STATE
+       ============================================ */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-subtle);
+      border-top-color: var(--accent-gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .formation-panel {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+      }
+      .scorers-panel {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+      }
+      .assists-panel {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+      }
+      .overview-panel {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+      }
+      .breakdown-panel {
+        grid-column: 1 / 3;
+        grid-row: 3 / 4;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html { font-size: 13px; }
+      .dashboard-header { padding: 0 1rem; }
+      .dashboard-body { padding: 1rem; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .formation-panel,
+      .scorers-panel,
+      .assists-panel,
+      .overview-panel,
+      .breakdown-panel {
+        grid-column: 1 / -1;
+        grid-row: auto;
+      }
+      .dream-xi-strip { gap: 6px; }
+      .player-card { width: 110px; }
+      .header-meta { display: none; }
+    }
+
+    /* ============================================
+       NATION FLAG UTIL
+       ============================================ */
+    .nation-flag {
+      display: inline-block;
+      width: 16px;
+      height: 12px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 1px;
+      margin-right: 4px;
+      vertical-align: middle;
+      opacity: 0.9;
+    }
+
+    /* ============================================
+       SCORING METHODOLOGY
+       ============================================ */
+    .methodology-panel {
+      margin-top: 1.5rem;
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .method-grid { grid-template-columns: 1fr; }
+    }
+
+    .method-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .method-card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .method-card-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .method-card-title .dot.fw { background: var(--accent-red); }
+    .method-card-title .dot.mf { background: var(--accent-blue); }
+    .method-card-title .dot.df { background: var(--accent-green); }
+
+    .method-weight {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .method-weight:last-child {
+      border-bottom: none;
+    }
+
+    .method-weight-pct {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Tooltip -->
+  <div class="player-tooltip" id="playerTooltip"></div>
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-brand">
+      <div class="header-logo">XI</div>
+      <div>
+        <div class="header-title">FWC 2026 Dream XI</div>
+        <div class="header-subtitle">Player Analytics Dashboard</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="header-stat">
+        <div class="header-stat-value" id="headerTotalPlayers">—</div>
+        <div class="header-stat-label">Total Players</div>
+      </div>
+      <div class="header-stat">
+        <div class="header-stat-value" id="headerTotalGoals">—</div>
+        <div class="header-stat-label">Total Goals</div>
+      </div>
+      <div class="header-stat">
+        <div class="header-stat-value" id="headerNations">—</div>
+        <div class="header-stat-label">Nations</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Body -->
+  <main class="dashboard-body">
+    <!-- Section: Dream XI Cards -->
+    <div class="section-header">
+      <div class="section-icon" style="background: var(--accent-gold-dim); color: var(--accent-gold);">⭐</div>
+      <div class="section-title">Dream XI — Best 11 Players</div>
+    </div>
+    <div class="dream-xi-strip" id="dreamXIStrip"></div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+      <!-- Formation Panel -->
+      <div class="panel formation-panel">
+        <div class="panel-header">
+          <span class="panel-title">Formation 4-3-3</span>
+          <span class="panel-badge">Tactical View</span>
+        </div>
+        <div class="panel-body">
+          <div class="pitch" id="pitchView">
+            <div class="pitch-center-line"></div>
+            <div class="pitch-center-circle"></div>
+            <div class="pitch-box-top"></div>
+            <div class="pitch-box-bottom"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Scorers Panel -->
+      <div class="panel scorers-panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Goal Scorers</span>
+          <span class="panel-badge">Top 12</span>
+        </div>
+        <div class="panel-body">
+          <table class="stats-table" id="scorersTable">
+            <thead>
+              <tr>
+                <th style="width:24px">#</th>
+                <th>Player</th>
+                <th>Squad</th>
+                <th class="num">Goals</th>
+                <th class="num">G/90</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Top Assists Panel -->
+      <div class="panel assists-panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Assist Providers</span>
+          <span class="panel-badge">Top 12</span>
+        </div>
+        <div class="panel-body">
+          <table class="stats-table" id="assistsTable">
+            <thead>
+              <tr>
+                <th style="width:24px">#</th>
+                <th>Player</th>
+                <th>Squad</th>
+                <th class="num">Assists</th>
+                <th class="num">A/90</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KPI Overview Panel -->
+      <div class="panel overview-panel">
+        <div class="panel-header">
+          <span class="panel-title">Tournament Highlights</span>
+          <span class="panel-badge">Dream XI Stats</span>
+        </div>
+        <div class="panel-body">
+          <div class="kpi-grid" id="kpiGrid"></div>
+        </div>
+      </div>
+
+      <!-- Position Breakdown Panel -->
+      <div class="panel breakdown-panel">
+        <div class="panel-header">
+          <span class="panel-title">Dream XI by Position</span>
+          <span class="panel-badge">4-3-3</span>
+        </div>
+        <div class="panel-body" id="breakdownBody"></div>
+      </div>
+    </div>
+
+    <!-- Scoring Methodology -->
+    <div class="methodology-panel">
+      <div class="section-header" style="margin-top:0.5rem">
+        <div class="section-icon" style="background: var(--accent-cyan-dim); color: var(--accent-cyan);">⚙</div>
+        <div class="section-title">Scoring Methodology — Weighted Normalization</div>
+      </div>
+      <div class="method-grid" id="methodGrid"></div>
+    </div>
+
+    <!-- Full Rankings -->
+    <div class="rankings-section">
+      <div class="section-header">
+        <div class="section-icon" style="background: var(--accent-blue-dim); color: var(--accent-blue);">📊</div>
+        <div class="section-title">All Player Rankings</div>
+      </div>
+      <div class="filter-bar">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search player, nation, or club...">
+        <button class="filter-btn active" data-filter="ALL" id="filterAll">All</button>
+        <button class="filter-btn" data-filter="FW" id="filterFW">Forwards</button>
+        <button class="filter-btn" data-filter="MF" id="filterMF">Midfielders</button>
+        <button class="filter-btn" data-filter="DF" id="filterDF">Defenders</button>
+        <button class="filter-btn" data-filter="GK" id="filterGK">Goalkeepers</button>
+      </div>
+      <div class="panel rankings-panel">
+        <div class="panel-body">
+          <table class="rankings-table" id="rankingsTable">
+            <thead>
+              <tr>
+                <th class="num" data-col="rank">Rank</th>
+                <th data-col="player">Player</th>
+                <th data-col="pos">Pos</th>
+                <th data-col="squad">Nation</th>
+                <th data-col="club">Club</th>
+                <th class="num" data-col="mp">MP</th>
+                <th class="num" data-col="min">Min</th>
+                <th class="num" data-col="gls">Gls</th>
+                <th class="num" data-col="ast">Ast</th>
+                <th class="num" data-col="ga">G+A</th>
+                <th class="num" data-col="sh">Shots</th>
+                <th class="num" data-col="sot">SoT</th>
+                <th class="num" data-col="tkl">Tackles</th>
+                <th class="num" data-col="int">Int</th>
+                <th class="num" data-col="score" style="color:var(--accent-gold)">Score</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // =======================================================
+    // DATA LOADING & PARSING
+    // =======================================================
+
+    const NATION_MAP = {
+      'ar': '🇦🇷', 'au': '🇦🇺', 'be': '🇧🇪', 'br': '🇧🇷', 'ca': '🇨🇦',
+      'ch': '🇨🇭', 'ci': '🇨🇮', 'cm': '🇨🇲', 'co': '🇨🇴', 'cr': '🇨🇷',
+      'de': '🇩🇪', 'dk': '🇩🇰', 'dz': '🇩🇿', 'ec': '🇪🇨', 'eg': '🇪🇬',
+      'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'es': '🇪🇸', 'fr': '🇫🇷', 'gh': '🇬🇭', 'hr': '🇭🇷',
+      'ht': '🇭🇹', 'hu': '🇭🇺', 'ie': '🇮🇪', 'il': '🇮🇱', 'ir': '🇮🇷',
+      'it': '🇮🇹', 'jp': '🇯🇵', 'jo': '🇯🇴', 'kr': '🇰🇷', 'kw': '🇰🇼',
+      'ma': '🇲🇦', 'mx': '🇲🇽', 'ng': '🇳🇬', 'nl': '🇳🇱', 'no': '🇳🇴',
+      'nz': '🇳🇿', 'pe': '🇵🇪', 'pl': '🇵🇱', 'pt': '🇵🇹', 'py': '🇵🇾',
+      'qa': '🇶🇦', 'ro': '🇷🇴', 'rs': '🇷🇸', 'sa': '🇸🇦', 'sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+      'se': '🇸🇪', 'sn': '🇸🇳', 'tn': '🇹🇳', 'tr': '🇹🇷', 'uy': '🇺🇾',
+      'us': '🇺🇸', 'uz': '🇺🇿', 'wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'za': '🇿🇦'
+    };
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+      const headers = parseCSVLine(lines[0]);
+      const data = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const values = parseCSVLine(line);
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = values[idx] || '';
+        });
+        data.push(obj);
+      }
+      return data;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            current += ch;
+          }
+        } else {
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ',') {
+            result.push(current);
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function parseNation(squad) {
+      if (!squad) return { code: '', name: squad || '' };
+      const parts = squad.trim().split(' ');
+      const code = parts[0] || '';
+      const name = parts.slice(1).join(' ') || squad;
+      return { code, name };
+    }
+
+    function parseClub(club) {
+      if (!club) return '';
+      // Remove league prefix like "1.eng " "1.es " etc.
+      return club.replace(/^\d+\.\w+\s+/, '');
+    }
+
+    function getFlag(code) {
+      return NATION_MAP[code] || '';
+    }
+
+    function num(v, def = 0) {
+      const n = parseFloat(v);
+      return isNaN(n) ? def : n;
+    }
+
+    function posClass(pos) {
+      if (!pos) return 'mf';
+      if (pos.includes('GK')) return 'gk';
+      if (pos.includes('FW')) return 'fw';
+      if (pos.includes('DF')) return 'df';
+      return 'mf';
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = name.split(' ').filter(Boolean);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getLastName(name) {
+      if (!name) return '';
+      const parts = name.split(' ');
+      return parts[parts.length - 1];
+    }
+
+    // =======================================================
+    // MAIN
+    // =======================================================
+
+    let masterData = [];
+    let dreamXIData = [];
+    let dreamXINames = new Set();
+    let currentFilter = 'ALL';
+    let currentSort = { col: 'score', dir: 'desc' };
+
+    async function loadData() {
+      try {
+        const [masterText, dreamText] = await Promise.all([
+          fetch('../data/final/master_dataset.csv').then(r => r.text()),
+          fetch('../data/final/dream_xi.csv').then(r => r.text())
+        ]);
+
+        masterData = parseCSV(masterText).filter(d => d.Player && d.Player.trim());
+        dreamXIData = parseCSV(dreamText).filter(d => d.Player && d.Player.trim());
+        dreamXINames = new Set(dreamXIData.map(d => d.Player.trim()));
+
+        // Assign scores from outfield_rankings to master data
+        // Dream XI data has Score column
+        const dreamScoreMap = {};
+        dreamXIData.forEach(d => {
+          dreamScoreMap[d.Player.trim()] = num(d.Score);
+        });
+
+        // Load outfield rankings for scores
+        const outfieldText = await fetch('../data/final/outfield_rankings.csv').then(r => r.text());
+        const outfieldData = parseCSV(outfieldText);
+        const scoreMap = {};
+        outfieldData.forEach(d => {
+          if (d.Player) scoreMap[d.Player.trim()] = num(d.Score);
+        });
+
+        // Merge scores into master
+        masterData.forEach(d => {
+          const pName = d.Player.trim();
+          d._score = dreamScoreMap[pName] || scoreMap[pName] || 0;
+          d._isDreamXI = dreamXINames.has(pName);
+          d._gls = num(d['Performance_Gls']);
+          d._ast = num(d['Performance_Ast']);
+          d._ga = num(d['Performance_G+A']);
+          d._gpk = num(d['Performance_G-PK']);
+          d._pk = num(d['Performance_PK']);
+          d._pkatt = num(d['Performance_PKatt']);
+          d._crdY = num(d['Performance_CrdY']);
+          d._crdR = num(d['Performance_CrdR']);
+          d._mp = num(d['Playing Time_MP']);
+          d._starts = num(d['Playing Time_Starts']);
+          d._min = num(d['Playing Time_Min_play'] || d['Playing Time_Min']);
+          d._90s = num(d['Playing Time_90s']);
+          d._sh = num(d['Standard_Sh']);
+          d._sot = num(d['Standard_SoT']);
+          d._tkl = num(d['Performance_TklW']);
+          d._int = num(d['Performance_Int']);
+          d._gls90 = num(d['Per 90 Minutes_Gls']);
+          d._ast90 = num(d['Per 90 Minutes_Ast']);
+          d._nation = parseNation(d.Squad);
+          d._club = parseClub(d.Club || '');
+          d._pos = d.Pos || '';
+        });
+
+        // Sort master by score desc
+        masterData.sort((a, b) => b._score - a._score);
+        masterData.forEach((d, i) => d._rank = i + 1);
+
+        // Also enrich dream XI data
+        dreamXIData.forEach(d => {
+          const master = masterData.find(m => m.Player.trim() === d.Player.trim());
+          if (master) {
+            Object.keys(master).forEach(k => {
+              if (k.startsWith('_')) d[k] = master[k];
+            });
+          }
+          d._score = num(d.Score) || (master ? master._score : 0);
+          d._pos = d.Pos || '';
+          if (!d._nation) d._nation = parseNation(d.Squad);
+        });
+
+        renderDashboard();
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        document.getElementById('loadingOverlay').innerHTML =
+          '<div style="text-align:center;color:var(--text-secondary);"><p style="font-size:1rem;font-weight:600;margin-bottom:8px;">Failed to load data</p><p style="font-size:0.75rem;color:var(--text-muted);">Please run from a local server (e.g. Live Server or python -m http.server)</p></div>';
+      }
+    }
+
+    // =======================================================
+    // RENDER
+    // =======================================================
+
+    function renderDashboard() {
+      renderHeader();
+      renderDreamXICards();
+      renderFormation();
+      renderTopScorers();
+      renderTopAssists();
+      renderKPIs();
+      renderBreakdown();
+      renderMethodology();
+      renderFullRankings();
+      setupFilters();
+      setupSearch();
+      setupTableSort();
+
+      // Hide loader
+      setTimeout(() => {
+        document.getElementById('loadingOverlay').classList.add('hidden');
+      }, 400);
+    }
+
+    // ---- Header Stats ----
+    function renderHeader() {
+      document.getElementById('headerTotalPlayers').textContent = masterData.length;
+      const totalGoals = masterData.reduce((s, d) => s + d._gls, 0);
+      document.getElementById('headerTotalGoals').textContent = totalGoals;
+      const nations = new Set(masterData.map(d => d._nation?.name).filter(Boolean));
+      document.getElementById('headerNations').textContent = nations.size;
+    }
+
+    // ---- Dream XI Cards ----
+    function renderDreamXICards() {
+      const strip = document.getElementById('dreamXIStrip');
+      // Sort: GK first, then DF, MF, FW
+      const posOrder = { 'GK': 0, 'DF': 1, 'MF': 2, 'FW': 3 };
+      const sorted = [...dreamXIData].sort((a, b) => {
+        const aO = posOrder[posClass(a._pos).toUpperCase()] ?? 2;
+        const bO = posOrder[posClass(b._pos).toUpperCase()] ?? 2;
+        return aO - bO || (b._score - a._score);
+      });
+
+      strip.innerHTML = sorted.map((d, i) => {
+        const pc = posClass(d._pos);
+        const name = d.Player || '';
+        const score = d._score ? d._score.toFixed(2) : '—';
+        const nation = d._nation ? d._nation.name : '';
+        return `
+          <div class="player-card pos-${pc}" data-player-idx="${i}">
+            <div class="player-card-rank">#${i + 1}</div>
+            <div class="player-card-avatar">${getInitials(name)}</div>
+            <div class="player-card-name" title="${name}">${name}</div>
+            <div class="player-card-team">${nation}</div>
+            <div class="player-card-pos">${d._pos}</div>
+            <div class="player-card-score">${score}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Setup hover tooltips
+      strip.querySelectorAll('.player-card').forEach((card, idx) => {
+        const d = sorted[idx];
+        card.addEventListener('mouseenter', (e) => showTooltip(e, d));
+        card.addEventListener('mousemove', (e) => moveTooltip(e));
+        card.addEventListener('mouseleave', hideTooltip);
+      });
+    }
+
+    // ---- Tooltip ----
+    function showTooltip(e, d) {
+      const tooltip = document.getElementById('playerTooltip');
+      const pc = posClass(d._pos);
+      const avatarColors = {
+        fw: 'background: var(--accent-red-dim); color: var(--accent-red);',
+        mf: 'background: var(--accent-blue-dim); color: var(--accent-blue);',
+        df: 'background: var(--accent-green-dim); color: var(--accent-green);',
+        gk: 'background: var(--accent-gold-dim); color: var(--accent-gold);'
+      };
+
+      const flag = d._nation ? getFlag(d._nation.code) : '';
+      const nation = d._nation ? d._nation.name : '';
+
+      let statsHTML = '';
+      if (pc === 'gk') {
+        // GK-specific stats from dream_xi.csv
+        statsHTML = `
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d['Performance_Save%'] || '—'}</div><div class="tooltip-stat-label">Save %</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d['Performance_CS%'] || '—'}</div><div class="tooltip-stat-label">CS %</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d['Performance_GA'] || '—'}</div><div class="tooltip-stat-label">GA</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d['Playing Time_MP'] || d._mp || '—'}</div><div class="tooltip-stat-label">Matches</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${Math.round(num(d['Playing Time_Min'] || d._min))}</div><div class="tooltip-stat-label">Minutes</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d['Performance_Saves'] || '—'}</div><div class="tooltip-stat-label">Saves</div></div>
+        `;
+      } else {
+        statsHTML = `
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._gls ?? '—'}</div><div class="tooltip-stat-label">Goals</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._ast ?? '—'}</div><div class="tooltip-stat-label">Assists</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._ga ?? '—'}</div><div class="tooltip-stat-label">G + A</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._sh ?? '—'}</div><div class="tooltip-stat-label">Shots</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._sot ?? '—'}</div><div class="tooltip-stat-label">Shots on T</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${Math.round(d._min ?? 0)}</div><div class="tooltip-stat-label">Minutes</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._tkl ?? '—'}</div><div class="tooltip-stat-label">Tackles Won</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._int ?? '—'}</div><div class="tooltip-stat-label">Intercept.</div></div>
+          <div class="tooltip-stat"><div class="tooltip-stat-value">${d._crdY ?? 0}/${d._crdR ?? 0}</div><div class="tooltip-stat-label">Y / R Cards</div></div>
+        `;
+      }
+
+      tooltip.innerHTML = `
+        <div class="tooltip-header">
+          <div class="tooltip-avatar" style="${avatarColors[pc]}">${getInitials(d.Player)}</div>
+          <div>
+            <div class="tooltip-player-name">${d.Player}</div>
+            <div class="tooltip-player-meta">${flag} ${nation} · ${d._club || ''} · ${d._pos}</div>
+          </div>
+          <div class="tooltip-score-badge">${d._score ? d._score.toFixed(2) : '—'}</div>
+        </div>
+        <div class="tooltip-stats-grid">${statsHTML}</div>
+      `;
+
+      moveTooltip(e);
+      tooltip.classList.add('visible');
+    }
+
+    function moveTooltip(e) {
+      const tooltip = document.getElementById('playerTooltip');
+      const pad = 16;
+      let x = e.clientX + pad;
+      let y = e.clientY + pad;
+      const rect = tooltip.getBoundingClientRect();
+      if (x + 360 > window.innerWidth) x = e.clientX - 360 - pad;
+      if (y + rect.height > window.innerHeight) y = e.clientY - rect.height - pad;
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+    }
+
+    function hideTooltip() {
+      document.getElementById('playerTooltip').classList.remove('visible');
+    }
+
+    // ---- Formation View ----
+    function renderFormation() {
+      const pitch = document.getElementById('pitchView');
+
+      // 4-3-3 positions (top = attacking, bottom = GK)
+      const positions433 = {
+        'GK': [{ x: 50, y: 92 }],
+        'DF': [
+          { x: 15, y: 72 }, { x: 38, y: 76 }, { x: 62, y: 76 }, { x: 85, y: 72 }
+        ],
+        'MF': [
+          { x: 25, y: 52 }, { x: 50, y: 48 }, { x: 75, y: 52 }
+        ],
+        'FW': [
+          { x: 20, y: 24 }, { x: 50, y: 18 }, { x: 80, y: 24 }
+        ]
+      };
+
+      const grouped = { GK: [], DF: [], MF: [], FW: [] };
+      dreamXIData.forEach(d => {
+        const pc = posClass(d._pos).toUpperCase();
+        if (grouped[pc]) grouped[pc].push(d);
+      });
+
+      Object.keys(grouped).forEach(pos => {
+        const players = grouped[pos];
+        const slots = positions433[pos] || [];
+        players.forEach((d, i) => {
+          if (i >= slots.length) return;
+          const { x, y } = slots[i];
+          const pc = posClass(d._pos);
+          const el = document.createElement('div');
+          el.className = 'pitch-player';
+          el.style.left = x + '%';
+          el.style.top = y + '%';
+          el.innerHTML = `
+            <div class="pitch-player-dot ${pc}">${getInitials(d.Player)}</div>
+            <div class="pitch-player-label">${getLastName(d.Player)}</div>
+          `;
+          el.addEventListener('mouseenter', (e) => showTooltip(e, d));
+          el.addEventListener('mousemove', (e) => moveTooltip(e));
+          el.addEventListener('mouseleave', hideTooltip);
+          pitch.appendChild(el);
+        });
+      });
+    }
+
+    // ---- Top Scorers ----
+    function renderTopScorers() {
+      const tbody = document.querySelector('#scorersTable tbody');
+      const top = [...masterData]
+        .filter(d => d._gls > 0)
+        .sort((a, b) => b._gls - a._gls || b._gls90 - a._gls90)
+        .slice(0, 12);
+
+      tbody.innerHTML = top.map((d, i) => {
+        const flag = getFlag(d._nation?.code);
+        const isDream = d._isDreamXI;
+        return `
+          <tr${isDream ? ' class="dream-xi-row"' : ''}>
+            <td class="table-rank">${i + 1}</td>
+            <td><span class="table-player-name">${d.Player}</span>${isDream ? '<span class="dream-xi-star">★</span>' : ''}</td>
+            <td>${flag} ${d._nation?.name || ''}</td>
+            <td class="num" style="font-weight:800;color:var(--text-primary)">${d._gls}</td>
+            <td class="num">${d._gls90.toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- Top Assists ----
+    function renderTopAssists() {
+      const tbody = document.querySelector('#assistsTable tbody');
+      const top = [...masterData]
+        .filter(d => d._ast > 0)
+        .sort((a, b) => b._ast - a._ast || b._ast90 - a._ast90)
+        .slice(0, 12);
+
+      tbody.innerHTML = top.map((d, i) => {
+        const flag = getFlag(d._nation?.code);
+        const isDream = d._isDreamXI;
+        return `
+          <tr${isDream ? ' class="dream-xi-row"' : ''}>
+            <td class="table-rank">${i + 1}</td>
+            <td><span class="table-player-name">${d.Player}</span>${isDream ? '<span class="dream-xi-star">★</span>' : ''}</td>
+            <td>${flag} ${d._nation?.name || ''}</td>
+            <td class="num" style="font-weight:800;color:var(--text-primary)">${d._ast}</td>
+            <td class="num">${d._ast90.toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- KPIs ----
+    function renderKPIs() {
+      const grid = document.getElementById('kpiGrid');
+      const dreamPlayers = masterData.filter(d => d._isDreamXI);
+      const totalDreamGoals = dreamPlayers.reduce((s, d) => s + d._gls, 0);
+      const totalDreamAssists = dreamPlayers.reduce((s, d) => s + d._ast, 0);
+      const totalDreamMinutes = dreamPlayers.reduce((s, d) => s + d._min, 0);
+      const avgScore = dreamPlayers.length > 0
+        ? (dreamPlayers.reduce((s, d) => s + d._score, 0) / dreamPlayers.length)
+        : 0;
+
+      const kpis = [
+        { value: totalDreamGoals, label: 'Dream XI Goals', cls: 'red' },
+        { value: totalDreamAssists, label: 'Dream XI Assists', cls: 'blue' },
+        { value: Math.round(totalDreamMinutes), label: 'Total Minutes', cls: 'green' },
+        { value: avgScore.toFixed(2), label: 'Avg Score', cls: 'gold' },
+      ];
+
+      grid.innerHTML = kpis.map(k => `
+        <div class="kpi-item ${k.cls}">
+          <div class="kpi-value">${k.value}</div>
+          <div class="kpi-label">${k.label}</div>
+        </div>
+      `).join('');
+    }
+
+    // ---- Position Breakdown ----
+    function renderBreakdown() {
+      const body = document.getElementById('breakdownBody');
+      const groups = [
+        { label: 'Forwards', code: 'FW', cls: 'fw', count: 3 },
+        { label: 'Midfielders', code: 'MF', cls: 'mf', count: 3 },
+        { label: 'Defenders', code: 'DF', cls: 'df', count: 4 },
+        { label: 'Goalkeeper', code: 'GK', cls: 'gk', count: 1 }
+      ];
+
+      body.innerHTML = groups.map(g => {
+        const players = dreamXIData.filter(d => posClass(d._pos || d.Pos).toUpperCase() === g.code.toUpperCase());
+        const pct = (players.length / 11 * 100);
+        return `
+          <div class="position-bar-item">
+            <div class="position-bar-header">
+              <span class="position-bar-label">${g.label}</span>
+              <span class="position-bar-count">${players.length} player${players.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="position-bar-track">
+              <div class="position-bar-fill ${g.cls}" style="width: ${pct}%"></div>
+            </div>
+            <div class="position-players">
+              ${players.map(p => `<span class="position-player-chip">${p.Player}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ---- Scoring Methodology ----
+    function renderMethodology() {
+      const grid = document.getElementById('methodGrid');
+      const methods = [
+        {
+          title: 'Forwards', cls: 'fw',
+          weights: [
+            ['Goals', '45%'], ['Assists', '20%'], ['Shots', '20%'], ['Shots on Target', '15%']
+          ]
+        },
+        {
+          title: 'Midfielders', cls: 'mf',
+          weights: [
+            ['Goals', '30%'], ['Assists', '30%'], ['Tackles Won', '20%'],
+            ['Interceptions', '10%'], ['Minutes Played', '10%']
+          ]
+        },
+        {
+          title: 'Defenders', cls: 'df',
+          weights: [
+            ['Tackles Won', '45%'], ['Interceptions', '35%'], ['Minutes Played', '20%']
+          ]
+        }
+      ];
+
+      grid.innerHTML = methods.map(m => `
+        <div class="method-card">
+          <div class="method-card-title">
+            <span class="dot ${m.cls}"></span>
+            ${m.title}
+          </div>
+          ${m.weights.map(w => `
+            <div class="method-weight">
+              <span>${w[0]}</span>
+              <span class="method-weight-pct">${w[1]}</span>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    // ---- Full Rankings Table ----
+    function renderFullRankings() {
+      updateRankingsTable();
+    }
+
+    function updateRankingsTable() {
+      const tbody = document.querySelector('#rankingsTable tbody');
+      let filtered = masterData;
+
+      // Position filter
+      if (currentFilter !== 'ALL') {
+        filtered = filtered.filter(d => {
+          const pos = d._pos.toUpperCase();
+          if (currentFilter === 'GK') return pos === 'GK';
+          return pos.includes(currentFilter);
+        });
+      }
+
+      // Search
+      const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+      if (searchTerm) {
+        filtered = filtered.filter(d => {
+          const haystack = [d.Player, d._nation?.name, d._club, d._pos, d.Squad].join(' ').toLowerCase();
+          return haystack.includes(searchTerm);
+        });
+      }
+
+      // Sort
+      const sortFn = getSortFunction(currentSort.col, currentSort.dir);
+      filtered.sort(sortFn);
+
+      // Show top 100
+      const display = filtered.slice(0, 100);
+
+      tbody.innerHTML = display.map((d, i) => {
+        const flag = getFlag(d._nation?.code);
+        const pc = posClass(d._pos);
+        const isDream = d._isDreamXI;
+        return `
+          <tr${isDream ? ' class="dream-xi-row"' : ''}>
+            <td class="num">${d._rank}</td>
+            <td><span class="table-player-name">${d.Player}</span>${isDream ? '<span class="dream-xi-star">★</span>' : ''}</td>
+            <td><span class="table-pos-badge ${pc}">${d._pos}</span></td>
+            <td>${flag} ${d._nation?.name || ''}</td>
+            <td style="color:var(--text-muted);font-size:0.65rem">${d._club || ''}</td>
+            <td class="num">${d._mp}</td>
+            <td class="num">${Math.round(d._min)}</td>
+            <td class="num" style="font-weight:700;color:${d._gls > 0 ? 'var(--text-primary)' : ''}">${d._gls}</td>
+            <td class="num" style="font-weight:700;color:${d._ast > 0 ? 'var(--text-primary)' : ''}">${d._ast}</td>
+            <td class="num">${d._ga}</td>
+            <td class="num">${d._sh}</td>
+            <td class="num">${d._sot}</td>
+            <td class="num">${d._tkl}</td>
+            <td class="num">${d._int}</td>
+            <td class="num" style="color:var(--accent-gold);font-weight:700">${d._score.toFixed(3)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Show count
+      const badge = document.querySelector('.rankings-panel .panel-badge');
+      if (badge) badge.textContent = `${filtered.length} players`;
+    }
+
+    function getSortFunction(col, dir) {
+      const mult = dir === 'asc' ? 1 : -1;
+      const accessors = {
+        rank: d => d._rank,
+        player: d => d.Player?.toLowerCase() || '',
+        pos: d => d._pos,
+        squad: d => d._nation?.name?.toLowerCase() || '',
+        club: d => d._club?.toLowerCase() || '',
+        mp: d => d._mp,
+        min: d => d._min,
+        gls: d => d._gls,
+        ast: d => d._ast,
+        ga: d => d._ga,
+        sh: d => d._sh,
+        sot: d => d._sot,
+        tkl: d => d._tkl,
+        int: d => d._int,
+        score: d => d._score
+      };
+      const fn = accessors[col] || accessors.score;
+      return (a, b) => {
+        const va = fn(a);
+        const vb = fn(b);
+        if (typeof va === 'string') return mult * va.localeCompare(vb);
+        return mult * (va - vb);
+      };
+    }
+
+    // ---- Filters ----
+    function setupFilters() {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          updateRankingsTable();
+        });
+      });
+    }
+
+    // ---- Search ----
+    function setupSearch() {
+      const input = document.getElementById('searchInput');
+      let debounce;
+      input.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(updateRankingsTable, 200);
+      });
+    }
+
+    // ---- Table Sort ----
+    function setupTableSort() {
+      document.querySelectorAll('#rankingsTable thead th[data-col]').forEach(th => {
+        th.addEventListener('click', () => {
+          const col = th.dataset.col;
+          if (currentSort.col === col) {
+            currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+          } else {
+            currentSort = { col, dir: 'desc' };
+          }
+
+          // Update header classes
+          document.querySelectorAll('#rankingsTable thead th').forEach(t => {
+            t.classList.remove('sorted-asc', 'sorted-desc');
+          });
+          th.classList.add(currentSort.dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+          updateRankingsTable();
+        });
+      });
+    }
+
+    // ---- Init ----
+    loadData();
+  </script>
+</body>
+</html>

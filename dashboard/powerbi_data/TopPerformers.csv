@@ -1,0 +1,28 @@
+Player,Position,Nation,Club,Goals,Assists,G+A,Goals per 90,Assists per 90,Shots,Shots on Target,Minutes Played,Dream XI,Goals Rank,Assists Rank
+Kylian Mbappé,FW,France,Real Madrid,8,3,11,1.19,0.45,41,23,605,Yes,1,12
+Lionel Messi,FW,Argentina,Inter Miami,8,4,12,1.16,0.58,35,18,620,Yes,2,5
+Erling Haaland,FW,Norway,Manchester City,7,0,7,1.35,0.0,20,13,465,Yes,3,
+Jude Bellingham,MF,England,Real Madrid,6,1,7,0.9,0.15,19,13,602,Yes,4,
+Harry Kane,FW,England,Bayern Munich,6,1,7,0.83,0.14,23,12,652,No,5,
+Mikel Oyarzabal,FW,Spain,Real Sociedad,5,1,6,0.83,0.17,23,12,540,No,6,
+Ousmane Dembélé,MF,France,PSG,5,2,7,0.82,0.33,20,10,547,Yes,7,
+Ismaila Sarr,MFFW,Senegal,Crystal Palace,4,1,5,0.99,0.25,17,6,364,No,8,
+Julián Quiñones,FWMF,Mexico,Al-Qadsiah,4,1,5,0.88,0.22,14,6,410,No,9,
+Vinicius Júnior,FW,Brazil,Real Madrid,4,1,5,0.82,0.2,17,11,440,No,10,
+Deniz Undav,FW,Germany,Stuttgart,3,2,5,1.79,1.19,6,4,151,No,11,14
+Johan Manzambi,MFFW,Switzerland,Freiburg,3,2,5,1.36,0.9,6,3,199,No,12,
+Brian Brobbey,FW,Netherlands,Sunderland,3,0,3,1.21,0.0,4,3,223,No,13,
+Romelu Lukaku,FW,Belgium,Napoli,3,1,4,1.16,0.39,6,3,233,No,14,
+Elijah Just,MF,New Zealand,Motherwell,3,0,3,1.02,0.0,7,5,264,No,15,
+Michael Olise,MF,France,Bayern Munich,0,5,5,0.0,0.81,20,5,556,Yes,,1
+Bruno Guimarães,MF,Brazil,Newcastle,0,4,4,0.0,0.87,8,2,416,No,,2
+Brahim Díaz,MF,Morocco,Real Madrid,0,4,4,0.0,0.79,6,1,457,No,,3
+Martin Ødegaard,MF,Norway,Arsenal,0,4,4,0.0,0.77,9,3,470,No,,4
+Andreas Schjelderup,FW,Norway,Benfica,1,3,4,0.36,1.07,3,2,252,No,,6
+Bukayo Saka,MF,England,Arsenal,0,3,3,0.0,1.01,13,7,268,No,,7
+Alexander Isak,FW,Sweden,Liverpool,1,3,4,0.25,0.76,8,6,357,No,,8
+Florian Wirtz,MF,Germany,Liverpool,0,3,3,0.0,0.75,10,1,361,No,,9
+Anthony Gordon,MF,England,Barcelona,1,3,4,0.23,0.68,6,4,396,No,,10
+Roberto Alvarado,FWMF,Mexico,Guadalajara,0,3,3,0.0,0.63,5,0,428,No,,11
+Iliman Ndiaye,FW,Senegal,Everton,1,2,3,0.79,1.58,3,2,114,No,,13
+Houssem Aouar,MF,Algeria,Al-Ittihad,0,2,2,0.0,1.04,3,1,173,No,,15

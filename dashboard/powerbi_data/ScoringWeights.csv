@@ -1,0 +1,17 @@
+Position,Metric,Weight
+Forward,Goals,0.45
+Forward,Assists,0.2
+Forward,Shots,0.2
+Forward,Shots on Target,0.15
+Midfielder,Goals,0.3
+Midfielder,Assists,0.3
+Midfielder,Tackles Won,0.2
+Midfielder,Interceptions,0.1
+Midfielder,Minutes Played,0.1
+Defender,Tackles Won,0.45
+Defender,Interceptions,0.35
+Defender,Minutes Played,0.2
+Goalkeeper,Save %,0.45
+Goalkeeper,Clean Sheets,0.35
+Goalkeeper,Saves,0.2
+Goalkeeper,Goals Against (penalty),-0.15

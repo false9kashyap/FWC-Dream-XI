@@ -1,0 +1,12 @@
+Rank,Player,Position,Nation Code,Nation,Club,Age,Born,Matches Played,Starts,Minutes Played,90s Played,Goals,Assists,Goals + Assists,Non-Penalty Goals,Penalties Scored,Penalties Attempted,Yellow Cards,Red Cards,Goals per 90,Assists per 90,G+A per 90,Shots,Shots on Target,Tackles Won,Interceptions,Score,Dream XI,Position Group,Formation Slot
+1,Kylian Mbappé,FW,fr,France,Real Madrid,27,1998,7,7,605,6.7,10,3,11,7,1,2,1,0,1.19,0.45,1.64,41,23,1,0,0.92,Yes,Forward,4
+2,Lionel Messi,FW,ar,Argentina,Inter Miami,39,1987,7,6,620,6.9,8,4,12,8,0,2,0,0,1.16,0.58,1.74,35,18,10,0,0.8981,Yes,Forward,4
+3,Unai Simón,GK,es,Spain,Athletic Club,29,1997,7,7,630,7.0,0,0,0,0,0,0,0,0,0.0,0.0,0.0,0,0,0,0,0.8633,Yes,Goalkeeper,1
+4,Dayot Upamecano,DF,fr,France,Bayern Munich,27,1998,7,7,615,6.8,0,0,0,0,0,0,0,0,0.0,0.0,0.0,4,2,12,15,0.771,Yes,Defender,2
+5,Achraf Hakimi,DF,ma,Morocco,PSG,27,1998,6,6,570,6.3,1,2,3,1,0,0,1,0,0.16,0.32,0.47,14,4,10,5,0.7403,Yes,Defender,2
+6,Marc Cucurella,DF,es,Spain,Chelsea,27,1998,7,7,630,7.0,0,2,2,0,0,0,1,0,0.0,0.29,0.29,5,3,4,7,0.659,Yes,Defender,2
+7,Aymeric Laporte,DF,es,Spain,Athletic Club,32,1994,7,7,629,7.0,0,1,1,0,0,0,1,0,0.0,0.14,0.14,5,2,3,14,0.6522,Yes,Defender,2
+9,Erling Haaland,FW,no,Norway,Manchester City,25,2000,5,5,465,5.2,7,0,7,7,0,0,0,0,1.35,0.0,1.35,20,13,0,1,0.5761,Yes,Forward,4
+16,Jude Bellingham,MF,eng,England,Real Madrid,23,2003,7,7,602,6.7,6,1,7,6,0,0,1,0,0.9,0.15,1.05,19,13,10,3,0.4922,Yes,Midfielder,3
+22,Michael Olise,MF,fr,France,Bayern Munich,24,2001,7,7,556,6.2,0,5,5,0,0,0,1,0,0.0,0.81,0.81,20,5,8,3,0.4806,Yes,Midfielder,3
+34,Ousmane Dembélé,MF,fr,France,PSG,29,1997,7,7,547,6.1,5,2,7,5,0,0,0,0,0.82,0.33,1.15,20,10,2,0,0.4067,Yes,Midfielder,3
