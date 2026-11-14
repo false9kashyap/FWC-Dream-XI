@@ -69,7 +69,6 @@ FWC-Dream-XI/
 |
 ├── dashboard/
 │   ├── DreamXI.pbix
-│   ├── index.html
 │   └── powerbi_data/
 |
 ├── images/
