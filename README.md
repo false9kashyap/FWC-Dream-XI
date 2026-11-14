@@ -105,7 +105,6 @@ The dashboard provides:
 
 - Python
 - Pandas
-- NumPy
 - Scikit-learn
 
 ### Visualization
