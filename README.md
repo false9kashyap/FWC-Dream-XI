@@ -69,6 +69,7 @@ FWC-Dream-XI/
 |
 ├── dashboard/
 │   ├── DreamXI.pbix
+│   ├── index.html
 │   └── powerbi_data/
 |
 ├── images/
@@ -104,6 +105,7 @@ The dashboard provides:
 
 - Python
 - Pandas
+- NumPy
 - Scikit-learn
 
 ### Visualization

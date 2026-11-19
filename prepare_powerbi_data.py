@@ -164,30 +164,104 @@ print(f"  -> AllPlayers.csv: {len(all_players)} rows")
 # ============================================================
 dream_players = [p for p in all_players if p["Dream XI"] == "Yes"]
 
-# Add position group for nice display
+FLAG_MAP = {
+    "France": "🇫🇷",
+    "Argentina": "🇦🇷",
+    "Norway": "🇳🇴",
+    "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "Spain": "🇪🇸",
+    "Morocco": "🇲🇦",
+}
+
+FORMATION_COORDS = {
+    "Erling Haaland": (50, 88),
+    "Kylian Mbappé": (20, 82),
+    "Lionel Messi": (80, 82),
+    "Ousmane Dembélé": (22, 56),
+    "Jude Bellingham": (50, 48),
+    "Michael Olise": (78, 56),
+    "Marc Cucurella": (16, 28),
+    "Dayot Upamecano": (38, 24),
+    "Aymeric Laporte": (62, 24),
+    "Achraf Hakimi": (84, 28),
+    "Unai Simón": (50, 8),
+}
+
+# Add position group, pitch coordinates, flags, GK metrics, and custom stats
 for p in dream_players:
     pos = p["Position"]
+    name = p["Player"]
+    nation = p.get("Nation", "")
+    flag = FLAG_MAP.get(nation, "")
+    coords = FORMATION_COORDS.get(name, (50, 50))
+    
+    p["Player Display"] = f"{name} {flag}".strip()
+    p["Pitch_X"] = coords[0]
+    p["Pitch_Y"] = coords[1]
+    p["Algorithm Score"] = round(safe_float(p.get("Score", 0)), 3)
+
+    # GK stats integration
+    gk_info = gk_map.get(name, {})
+    cs = safe_int(gk_info.get("Performance_CS", 0))
+    ga = safe_int(gk_info.get("Performance_GA", 0))
+    saves = safe_int(gk_info.get("Performance_Saves", 0))
+    p["Clean Sheets"] = cs
+    p["Goals Conceded"] = ga
+    p["Saves"] = saves
+
     if "GK" in pos:
         p["Position Group"] = "Goalkeeper"
         p["Formation Slot"] = 1
+        p["Stat1_Label"] = "Clean Sheets"
+        p["Stat1_Value"] = cs
+        p["Stat2_Label"] = "Goals Conceded"
+        p["Stat2_Value"] = ga
     elif "DF" in pos:
         p["Position Group"] = "Defender"
         p["Formation Slot"] = 2
+        p["Stat1_Label"] = "Tackles Won"
+        p["Stat1_Value"] = p.get("Tackles Won", 0)
+        p["Stat2_Label"] = "Interceptions"
+        p["Stat2_Value"] = p.get("Interceptions", 0)
     elif "MF" in pos:
         p["Position Group"] = "Midfielder"
         p["Formation Slot"] = 3
+        p["Stat1_Label"] = "Goals"
+        p["Stat1_Value"] = p.get("Goals", 0)
+        p["Stat2_Label"] = "Assists"
+        p["Stat2_Value"] = p.get("Assists", 0)
     elif "FW" in pos:
         p["Position Group"] = "Forward"
         p["Formation Slot"] = 4
+        p["Stat1_Label"] = "Goals"
+        p["Stat1_Value"] = p.get("Goals", 0)
+        p["Stat2_Label"] = "Assists"
+        p["Stat2_Value"] = p.get("Assists", 0)
     else:
         p["Position Group"] = "Other"
         p["Formation Slot"] = 5
+        p["Stat1_Label"] = "Stat 1"
+        p["Stat1_Value"] = 0
+        p["Stat2_Label"] = "Stat 2"
+        p["Stat2_Value"] = 0
 
-dream_columns = columns_order + ["Position Group", "Formation Slot"]
+dream_columns = [
+    "Rank", "Player", "Player Display", "Position", "Position Group", "Formation Slot",
+    "Pitch_X", "Pitch_Y", "Algorithm Score",
+    "Stat1_Label", "Stat1_Value", "Stat2_Label", "Stat2_Value",
+    "Clean Sheets", "Goals Conceded", "Saves"
+] + [k for k in columns_order if k not in ["Rank", "Player"]] + ["Position Group", "Formation Slot"]
+# Deduplicate preserving order
+seen = set()
+dream_columns_clean = []
+for c in dream_columns:
+    if c not in seen:
+        seen.add(c)
+        dream_columns_clean.append(c)
 
 output_path = os.path.join(OUTPUT_DIR, "DreamXI.csv")
 with open(output_path, "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=dream_columns)
+    writer = csv.DictWriter(f, fieldnames=dream_columns_clean)
     writer.writeheader()
     writer.writerows(dream_players)
 print(f"  -> DreamXI.csv: {len(dream_players)} rows")
